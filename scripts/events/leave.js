@@ -1,107 +1,76 @@
-const fs = require("fs");
-const path = require("path");
-const Canvas = require("canvas");
-const axios = require("axios");
+const { getTime, drive } = global.utils;
 
 module.exports = {
-  config: {
-    name: "leave_nisan",
-    version: "1.2.0",
-    author: "Nisan x GPT-5",
-    category: "events"
-  },
+	config: {
+		name: "leave",
+		version: "2.0",
+		author: "Nisan Editz",
+		category: "events"
+	},
 
-  onStart: async function ({ api, event, threadsData, usersData }) {
-    if (event.logMessageType !== "log:unsubscribe") return;
+	onStart: async ({ threadsData, message, event, api, usersData }) => {
+		if (event.logMessageType !== "log:unsubscribe") return;
 
-    const { threadID } = event;
-    const threadData = await threadsData.get(threadID);
-    if (!threadData.settings.sendLeaveMessage) return;
+		const { threadID } = event;
+		const threadData = await threadsData.get(threadID);
+		if (!threadData?.settings?.sendLeaveMessage) return;
 
-    const { leftParticipantFbId } = event.logMessageData;
-    if (leftParticipantFbId == api.getCurrentUserID()) return;
+		const { leftParticipantFbId } = event.logMessageData;
+		if (leftParticipantFbId == api.getCurrentUserID()) return;
 
-    const threadInfo = await api.getThreadInfo(threadID);
-    const groupName = threadInfo.threadName || "NVC_VIDEO_CREATOR";
-    const userName = await usersData.getName(leftParticipantFbId);
+		const userName = await usersData.getName(leftParticipantFbId);
+		const threadInfo = await api.getThreadInfo(threadID);
+		const memberCount = threadInfo.participantIDs.length;
 
-    const isSelfLeave = leftParticipantFbId == event.author;
+		const hours = getTime("HH");
+		let session = "";
+		if (hours <= 10) session = "🌅 শুভ সকাল";
+		else if (hours <= 12) session = "🌞 শুভ দুপুর";
+		else if (hours <= 18) session = "🌇 শুভ বিকাল";
+		else session = "🌙 শুভ সন্ধ্যা";
 
-    // ===== Random background list =====
-    const bgs = [
-      "https://i.imgur.com/bot-bg-RSb9Y1g.jpg",
-      "https://i.imgur.com/bby-bg-AZgGFtp.jpg"
-    ];
-    const bgUrl = bgs[Math.floor(Math.random() * bgs.length)];
+		// Random cute text 😍
+		const randomText = [
+			"আশা করি ওর দিনটা ভালো কাটবে! 💫",
+			"আমরা মিস করবো ওকে 😢",
+			"গ্রুপটা একটু ফাঁকা লাগবে এখন 😔",
+			"ওকে ছাড়া গ্রুপটা আগের মতো রইল না 💔",
+			"আবার দেখা হবে হয়তো কোনো দিনে 😊"
+		];
+		const cuteMsg = randomText[Math.floor(Math.random() * randomText.length)];
 
-    // ===== Load images =====
-    const bg = await Canvas.loadImage(bgUrl);
-    const profileUrl = `https://graph.facebook.com/${leftParticipantFbId}/picture?width=512&height=512`;
-    const profile = await Canvas.loadImage(profileUrl);
+		const type = leftParticipantFbId == event.author
+			? "নিজে থেকে চলে গেছে 🥲"
+			: "গ্রুপ থেকে রিমুভ করা হয়েছে 🚫";
 
-    const canvas = Canvas.createCanvas(900, 500);
-    const ctx = canvas.getContext("2d");
+		const msg = `✨ ${session} ✨
 
-    // Background
-    ctx.drawImage(bg, 0, 0, 900, 500);
+${userName} ${type}।
 
-    // ===== Glow pink frame =====
-    ctx.save();
-    ctx.shadowColor = "rgba(255,105,180,0.8)";
-    ctx.shadowBlur = 40;
-    ctx.beginPath();
-    ctx.arc(450, 220, 120, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fillStyle = "#fff";
-    ctx.fill();
-    ctx.clip();
-    ctx.drawImage(profile, 330, 100, 240, 240);
-    ctx.restore();
+${cuteMsg}
 
-    // ===== Load custom Bangla font =====
-    const fontPath = path.join(__dirname, "NisanBangla.ttf");
-    if (fs.existsSync(fontPath)) {
-      Canvas.registerFont(fontPath, { family: "NisanBangla" });
-    }
+👥 এখন গ্রুপে আছে মোট ${memberCount} জন মেম্বার ❤️`;
 
-    // ===== Text: Bangla Style =====
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "center";
-    ctx.font = '40px "NisanBangla"';
-    ctx.fillText("বিদায় 👋", 450, 380);
-    ctx.fillText("আবার দেখা হবে 🥀", 450, 420);
+		const form = {
+			body: msg,
+			mentions: [{
+				id: leftParticipantFbId,
+				tag: userName
+			}]
+		};
 
-    // ===== Text: English Name & Group =====
-    ctx.font = "bold 30px Sans";
-    ctx.fillStyle = "#ffb6c1";
-    ctx.fillText(`${userName}`, 450, 330);
-    ctx.fillStyle = "#00e5ff";
-    ctx.fillText(`${groupName}`, 450, 460);
+		// Optional: যদি কোনো লিভ ইমেজ সেট করা থাকে
+		if (threadData.data?.leaveAttachment) {
+			const files = threadData.data.leaveAttachment;
+			const attachments = files.reduce((acc, file) => {
+				acc.push(drive.getFile(file, "stream"));
+				return acc;
+			}, []);
+			form.attachment = (await Promise.allSettled(attachments))
+				.filter(({ status }) => status === "fulfilled")
+				.map(({ value }) => value);
+		}
 
-    // Save image
-    const imagePath = path.join(__dirname, "leave_nisan.png");
-    const buffer = canvas.toBuffer("image/png");
-    fs.writeFileSync(imagePath, buffer);
-
-    // ===== Custom Bangla leave message =====
-    const leaveText = `
-💔 ${userName} ${
-      isSelfLeave ? "নিজে থেকেই গ্রুপটি ছেড়ে গেছেন 😢" : "অ্যাডমিন দ্বারা রিমুভ হয়েছেন 🚫"
-    }
-
-📌 গ্রুপের নাম: ${groupName}
-🕰️ সময়: ${new Date().toLocaleTimeString("bn-BD")}
-
-🌷 ${userName}, তোমার অভাব অনুভব করবো 🥀
-আশা করি আবার দেখা হবে 💞
-`;
-
-    api.sendMessage(
-      {
-        body: leaveText,
-        attachment: fs.createReadStream(imagePath)
-      },
-      threadID
-    );
-  }
+		message.send(form);
+	}
 };
