@@ -1,119 +1,28 @@
-[
-    {
-        "key": "dbln",
-        "value": "%7B%2261578874007706%22%3A%22MIYmDsXf%22%7D",
-        "domain": "facebook.com",
-        "path": "/login/device-based/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "datr",
-        "value": "7wAaaQJR2d5FUM7UFtm1YxQJ",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "sb",
-        "value": "7wAaaXJKZc64AHkDahSS1nyo",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "m_pixel_ratio",
-        "value": "2.8125",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "wd",
-        "value": "384x854",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "c_user",
-        "value": "61578874007706",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "xs",
-        "value": "5%3AZ0lXJL_HGCaDaw%3A2%3A1763311879%3A-1%3A-1",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "fr",
-        "value": "0IZgv1sB9lcnsznlN.AWexnzafeuR1-3CslLbZAsZ7WXf47i4C145kudk6vua_LpYt_20.BpGgDv..AAA.0.0.BpGgEN.AWcTgfwPPoey4azPZ0eWFYCpluo",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "locale",
-        "value": "en_US",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "pas",
-        "value": "61578874007706%3ALQ8Do5j9UE",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "wl_cbv",
-        "value": "v2%3Bclient_version%3A2986%3Btimestamp%3A1763311885",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "fbl_st",
-        "value": "101715211%3BT%3A29388531",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    },
-    {
-        "key": "vpd",
-        "value": "v1%3B676x384x2.8125",
-        "domain": "facebook.com",
-        "path": "/",
-        "hostOnly": false,
-        "creation": "2025-11-16T16:59:54.812Z",
-        "lastAccessed": "2025-11-16T16:59:54.812Z"
-    }
-]
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm install
+    - run: npm start
