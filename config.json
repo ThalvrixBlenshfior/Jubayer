@@ -12,8 +12,8 @@
   "antiInbox": false,
   "language": "en",
   "notesLanguage": "change to your language with ISO 639-1 code, available languages: vi (Vietnamese), en (English)",
-  "nickNameBot": "『 - 』•『𝚈 𝙾 𝚄 𝚁 - 𝙱 ꫝ 𝙱 𝚈 - 𝚅𝟸』",
-  "prefix": "-",
+  "nickNameBot": "NΞXΩRIM [ 𝗦𝗼𝗹𝗹𝗲𝘃𝗮𝗿𝘀𝗶 𝗔𝗶 𝗦𝘂𝗽𝗿𝗲𝗺𝗼 ]",
+  "prefix": "/",
   "api": "https://www.noobs-api.rf.gd/dipto",
   "approval": false,
   "reactBy": {
@@ -31,19 +31,19 @@
     "ignoreCommand": []
   },
   "adminBot": [
-    "61579342122560",
-    "100070686408141"
+    "61578902230970",
+    "61578902230970"
   ],
   "mainAdmin": [
-    "61579342122560"
+    "61578902230970"
   ],
 	"vipUser": [
-    "61579342122560",
-	  "100070686408141"
+    "61578902230970",
+	  "61578902230970"
     ],
 	"GOD": [
-                "61579342122560",
-                "100070686408141"
+                "61578902230970",
+                "61578902230970"
         ],
 	"DEV": [
     "61579342122560",
@@ -54,7 +54,7 @@
     "100070686408141"
         ],
   "nisanBot": [
-		"28297135763266706"
+		"61578902230970"
 	],
   "whiteListMode": {
     "enable": true,
@@ -73,7 +73,7 @@
     "how_it_work": "if you enable both whiteListMode and whiteListModeThread, the system will check if the user is in whiteListIds, then check if the thread is in whiteListThreadIds, if one of the conditions is true, the user can use the bot"
   },
   "database": {
-    "type": "mongodb",
+    "type": "sqlite",
     "uriMongodb": "",
     "autoSyncWhenStart": false,
     "autoRefreshThreadInfoFirstTime": true,
